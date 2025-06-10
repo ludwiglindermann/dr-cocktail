@@ -1,0 +1,7 @@
+{
+  "name": "dr-cocktail",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
