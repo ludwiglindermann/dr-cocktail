@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Información del Usuario</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Usuario:</strong> {{ usuario }}</p>
+      <p><strong>Correo:</strong> {{ correo }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" color="medium" routerLink="/home">
+    Volver al inicio
+  </ion-button>
+</ion-content>

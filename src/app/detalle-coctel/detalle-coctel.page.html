@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ coctel?.nombre }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-img [src]="coctel?.imagen" [alt]="coctel?.nombre"></ion-img>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Ingredientes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ul>
+        <li *ngFor="let ingrediente of coctel?.ingredientes">{{ ingrediente }}</li>
+      </ul>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Preparación</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ coctel?.preparacion }}
+    </ion-card-content>
+  </ion-card>
+  <ion-button expand="block" color="primary" routerLink="/home">Volver</ion-button>
+</ion-content>

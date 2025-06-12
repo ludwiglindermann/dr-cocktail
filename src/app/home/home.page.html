@@ -1,20 +1,33 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>Bienvenido a Dr. Cocktail</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <!-- Botones superiores -->
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button expand="block" color="medium" routerLink="/perfil">
+          Ver mi perfil
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button expand="block" color="danger" (click)="cerrarSesion()">
+          Cerrar sesión
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Lista de cócteles -->
+  <ion-card *ngFor="let coctel of cocteles" (click)="verDetalle(coctel)">
+    <img [src]="coctel.imagen" alt="Imagen del cóctel" />
+    <ion-card-header>
+      <ion-card-title>{{ coctel.nombre }}</ion-card-title>
+    </ion-card-header>
+  </ion-card>
+
 </ion-content>
