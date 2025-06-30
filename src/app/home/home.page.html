@@ -6,7 +6,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- Botones superiores -->
+  <!-- Botones de perfil y cerrar sesión -->
   <ion-grid>
     <ion-row>
       <ion-col>
@@ -23,11 +23,22 @@
   </ion-grid>
 
   <!-- Lista de cócteles -->
-  <ion-card *ngFor="let coctel of cocteles" (click)="verDetalle(coctel)">
+  <ion-card *ngFor="let coctel of cocteles">
     <img [src]="coctel.imagen" alt="Imagen del cóctel" />
     <ion-card-header>
       <ion-card-title>{{ coctel.nombre }}</ion-card-title>
     </ion-card-header>
+    <ion-card-content>
+      <ion-button expand="block" color="primary" (click)="verDetalle(coctel)">
+        Ver Detalle
+      </ion-button>
+      <ion-button
+        expand="block"
+        [color]="esFavorito(coctel) ? 'warning' : 'success'"
+        (click)="toggleFavorito(coctel)">
+        {{ esFavorito(coctel) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}
+      </ion-button>
+    </ion-card-content>
   </ion-card>
 
 </ion-content>

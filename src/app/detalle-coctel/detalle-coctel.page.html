@@ -1,28 +1,37 @@
+<!-- encabezado superior con el nombre del cóctel -->
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ coctel?.nombre }}</ion-title>
+    <ion-title>{{ coctel?.nombre }}</ion-title> <!-- Muestra el nombre dinámicamente -->
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <!-- imagen del cóctel -->
   <ion-img [src]="coctel?.imagen" [alt]="coctel?.nombre"></ion-img>
+
+  <!-- tarjeta de ingredientes -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Ingredientes</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ul>
+        <!-- lista dinámica de ingredientes -->
         <li *ngFor="let ingrediente of coctel?.ingredientes">{{ ingrediente }}</li>
       </ul>
     </ion-card-content>
   </ion-card>
+
+  <!-- tarjeta de preparación -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Preparación</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      {{ coctel?.preparacion }}
+      {{ coctel?.preparacion }} <!-- texto con la preparación -->
     </ion-card-content>
   </ion-card>
+
+  <!-- botón para volver al home -->
   <ion-button expand="block" color="primary" routerLink="/home">Volver</ion-button>
 </ion-content>

@@ -1,0 +1,68 @@
+import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage-angular';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StorageService {
+  private _storage: Storage | null = null;
+
+  constructor(private storage: Storage) {
+    this.init();
+  }
+
+  // Inicializar storage
+  async init() {
+    const store = await this.storage.create();
+    this._storage = store;
+  }
+
+  // Usuarios (mantenemos estas funciones)
+  async agregarUsuario(nuevoUsuario: any) {
+    let usuarios = await this._storage?.get('usuarios');
+    if (!usuarios) {
+      usuarios = [];
+    }
+    usuarios.push(nuevoUsuario);
+    await this._storage?.set('usuarios', usuarios);
+  }
+
+  async obtenerUsuarios(): Promise<any[]> {
+    const usuarios = await this._storage?.get('usuarios');
+    return usuarios || [];
+  }
+
+  async validarUsuario(nombre: string, contrasena: string) {
+    const usuarios = await this.obtenerUsuarios();
+    return usuarios.find(u => u.usuario === nombre && u.contrasena === contrasena);
+  }
+
+  async obtenerUsuario(nombre: string) {
+    const usuarios = await this.obtenerUsuarios();
+    return usuarios.find(u => u.usuario === nombre);
+  }
+
+  // ---------------------------------------------------------
+  // FAVORITOS
+  // ---------------------------------------------------------
+
+  async obtenerFavoritos(): Promise<any[]> {
+    const favs = await this._storage?.get('favoritos');
+    return favs || [];
+  }
+
+  async agregarFavorito(coctel: any) {
+    let favs = await this.obtenerFavoritos();
+    // Evitar duplicados
+    if (!favs.find(f => f.nombre === coctel.nombre)) {
+      favs.push(coctel);
+      await this._storage?.set('favoritos', favs);
+    }
+  }
+
+  async eliminarFavorito(nombre: string) {
+    let favs = await this.obtenerFavoritos();
+    favs = favs.filter(f => f.nombre !== nombre);
+    await this._storage?.set('favoritos', favs);
+  }
+}

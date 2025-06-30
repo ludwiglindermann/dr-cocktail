@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,11 @@ export class LoginPage {
   usuario: string = '';
   contrasena: string = '';
 
-  constructor(private router: Router, private alertController: AlertController) {}
+  constructor(
+    private router: Router,
+    private alertController: AlertController,
+    private storage: Storage
+  ) {}
 
   async ingresar() {
     if (!this.usuario || !this.contrasena) {
@@ -20,32 +25,32 @@ export class LoginPage {
       return;
     }
 
-    // Verifica contra admin o contra usuarios registrados
-if (this.usuario === 'admin' && this.contrasena === '1234') {
-  const usuarioAdmin = {
-    usuario: 'admin',
-    correo: 'admin@correo.cl'
-  };
-  localStorage.setItem('usuarioActual', JSON.stringify(usuarioAdmin));
-  this.router.navigate(['/home']);
-  return;
-}
+    // Caso especial admin (lo mantiene igual)
+    if (this.usuario === 'admin' && this.contrasena === '1234') {
+      const usuarioAdmin = {
+        usuario: 'admin',
+        correo: 'admin@correo.cl'
+      };
+      await this.storage.set('usuarioActual', usuarioAdmin);
+      this.router.navigate(['/home']);
+      return;
+    }
 
-const usuariosGuardados = localStorage.getItem('usuarios');
-const usuarios = usuariosGuardados ? JSON.parse(usuariosGuardados) : [];
+    // Lee usuarios guardados desde Storage
+    const usuariosGuardados = (await this.storage.get('usuarios')) || [];
 
-const usuarioValido = usuarios.find(
-  (u: any) => u.usuario === this.usuario && u.contrasena === this.contrasena
-);
+    // Buscar coincidencia
+    const usuarioValido = usuariosGuardados.find(
+      (u: any) => u.usuario === this.usuario && u.contrasena === this.contrasena
+    );
 
-if (usuarioValido) {
-  localStorage.setItem('usuarioActual', JSON.stringify(usuarioValido));
-  this.router.navigate(['/home']);
-} else {
-  await this.mostrarAlerta('Usuario o contraseña incorrectos.');
-}
-
-
+    if (usuarioValido) {
+      // Guarda sesión en storage
+      await this.storage.set('usuarioActual', usuarioValido);
+      this.router.navigate(['/home']);
+    } else {
+      await this.mostrarAlerta('Usuario o contraseña incorrectos.');
+    }
   }
 
   async mostrarAlerta(mensaje: string) {
@@ -54,11 +59,10 @@ if (usuarioValido) {
       message: mensaje,
       buttons: ['OK']
     });
-
     await alerta.present();
   }
-  irARegistro() {
-  this.router.navigate(['/registro']);
-}
 
+  irARegistro() {
+    this.router.navigate(['/registro']);
+  }
 }

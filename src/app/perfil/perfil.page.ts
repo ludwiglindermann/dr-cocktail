@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { Storage } from '@ionic/storage-angular';
 
 @Component({
   selector: 'app-perfil',
@@ -6,16 +8,19 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./perfil.page.scss'],
   standalone: false,
 })
-export class PerfilPage implements OnInit {
-  usuario: string = '';
-  correo: string = '';
+export class PerfilPage {
+  usuario: any = null; // almacena todo el objeto del usuario actual
 
-  ngOnInit() {
-    const usuarioActual = localStorage.getItem('usuarioActual');
-    if (usuarioActual) {
-      const datos = JSON.parse(usuarioActual);
-      this.usuario = datos.usuario;
-      this.correo = datos.correo;
-    }
+  constructor(private storage: Storage, private router: Router) {}
+
+  async ionViewWillEnter() {
+    // cuando se entra a la vista, recupera el usuario desde Storage
+    this.usuario = await this.storage.get('usuarioActual');
+  }
+
+  cerrarSesion() {
+    // elimina usuario y redirige a login
+    this.storage.remove('usuarioActual');
+    this.router.navigate(['/login']);
   }
 }
