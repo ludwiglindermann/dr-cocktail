@@ -65,4 +65,10 @@ export class LoginPage {
   irARegistro() {
     this.router.navigate(['/registro']);
   }
+
+    mostrarAcercaDe() {
+    alert(
+      "Alumno: Ludwig Lindermann\nProfesor: Miguel Puebla\nCurso: Programación de Aplicaciones Móviles"
+    );
+  }
 }

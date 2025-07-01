@@ -1,30 +1,60 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Registro</ion-title>
+  <ion-toolbar>
+    <ion-title>Registro de usuario</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Usuario</ion-label>
-    <ion-input [(ngModel)]="nuevoUsuario" type="text"></ion-input>
-  </ion-item>
 
-  <ion-item>
-    <ion-label position="floating">Correo</ion-label>
-    <ion-input [(ngModel)]="nuevoCorreo" type="email"></ion-input> <!-- AGREGADO -->
-  </ion-item>
+  <form [formGroup]="registroForm" (ngSubmit)="registrar()">
+    <!-- Campo usuario -->
+    <ion-item>
+      <ion-label position="floating">Usuario</ion-label>
+      <ion-input type="text" formControlName="usuario"></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="registroForm.get('usuario')?.hasError('required') && registroForm.get('usuario')?.touched">
+      El usuario es obligatorio.
+    </ion-text>
+    <ion-text color="danger" *ngIf="registroForm.get('usuario')?.hasError('minlength') && registroForm.get('usuario')?.touched">
+      El usuario debe tener al menos 3 caracteres.
+    </ion-text>
+    <ion-text color="danger" *ngIf="registroForm.get('usuario')?.hasError('pattern') && registroForm.get('usuario')?.touched">
+      No se permiten espacios en blanco.
+    </ion-text>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input [(ngModel)]="nuevaContrasena" type="password"></ion-input>
-  </ion-item>
+    <!-- Campo contraseña -->
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input type="password" formControlName="contrasena"></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="registroForm.get('contrasena')?.hasError('required') && registroForm.get('contrasena')?.touched">
+      La contraseña es obligatoria.
+    </ion-text>
+    <ion-text color="danger" *ngIf="registroForm.get('contrasena')?.hasError('minlength') && registroForm.get('contrasena')?.touched">
+      La contraseña debe tener al menos 6 caracteres.
+    </ion-text>
 
-  <ion-button expand="block" color="success" (click)="registrar()">
-    Registrar
-  </ion-button>
+    <!-- Campo correo -->
+    <ion-item>
+      <ion-label position="floating">Correo electrónico</ion-label>
+      <ion-input type="email" formControlName="correo"></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="registroForm.get('correo')?.hasError('required') && registroForm.get('correo')?.touched">
+      El correo es obligatorio.
+    </ion-text>
+    <ion-text color="danger" *ngIf="registroForm.get('correo')?.hasError('email') && registroForm.get('correo')?.touched">
+      Formato de correo inválido.
+    </ion-text>
 
-  <ion-button expand="block" fill="clear" routerLink="/login">
-    Ya tengo cuenta
-  </ion-button>
+    <!-- Botón -->
+    <ion-button expand="block" type="submit" class="ion-margin-top">
+      Registrarse
+    </ion-button>
+
+    <!-- Enlace a login -->
+    <ion-button expand="block" fill="clear" routerLink="/login">
+      Ya tengo una cuenta
+    </ion-button>
+  </form>
+
 </ion-content>

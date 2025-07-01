@@ -11,13 +11,12 @@ export class StorageService {
     this.init();
   }
 
-  // Inicializar storage
   async init() {
     const store = await this.storage.create();
     this._storage = store;
   }
 
-  // Usuarios (mantenemos estas funciones)
+  // Usuarios (sin cambios)
   async agregarUsuario(nuevoUsuario: any) {
     let usuarios = await this._storage?.get('usuarios');
     if (!usuarios) {
@@ -42,27 +41,26 @@ export class StorageService {
     return usuarios.find(u => u.usuario === nombre);
   }
 
-  // ---------------------------------------------------------
-  // FAVORITOS
-  // ---------------------------------------------------------
+  // -------------------------------------------------------
+  // FAVORITOS POR USUARIO
+  // -------------------------------------------------------
 
-  async obtenerFavoritos(): Promise<any[]> {
-    const favs = await this._storage?.get('favoritos');
+  async obtenerFavoritos(usuario: string): Promise<any[]> {
+    const favs = await this._storage?.get(`favoritos_${usuario}`);
     return favs || [];
   }
 
-  async agregarFavorito(coctel: any) {
-    let favs = await this.obtenerFavoritos();
-    // Evitar duplicados
+  async agregarFavorito(usuario: string, coctel: any) {
+    let favs = await this.obtenerFavoritos(usuario);
     if (!favs.find(f => f.nombre === coctel.nombre)) {
       favs.push(coctel);
-      await this._storage?.set('favoritos', favs);
+      await this._storage?.set(`favoritos_${usuario}`, favs);
     }
   }
 
-  async eliminarFavorito(nombre: string) {
-    let favs = await this.obtenerFavoritos();
+  async eliminarFavorito(usuario: string, nombre: string) {
+    let favs = await this.obtenerFavoritos(usuario);
     favs = favs.filter(f => f.nombre !== nombre);
-    await this._storage?.set('favoritos', favs);
+    await this._storage?.set(`favoritos_${usuario}`, favs);
   }
 }

@@ -6,32 +6,42 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- Botones de perfil y cerrar sesión -->
-  <ion-grid>
-    <ion-row>
-      <ion-col>
-        <ion-button expand="block" color="medium" routerLink="/perfil">
-          Ver mi perfil
-        </ion-button>
-      </ion-col>
-      <ion-col>
-        <ion-button expand="block" color="danger" (click)="cerrarSesion()">
-          Cerrar sesión
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+<ion-grid>
+  <ion-row>
+    <ion-col>
+      <!-- Botón para ir al perfil -->
+      <ion-button expand="block" color="medium" routerLink="/perfil">
+        Ver mi perfil
+      </ion-button>
+    </ion-col>
+    <ion-col>
+      <!-- Botón para cerrar sesión -->
+      <ion-button expand="block" color="danger" (click)="cerrarSesion()">
+        Cerrar sesión
+      </ion-button>
+    </ion-col>
+    <ion-col>
+      <!-- Botón para ver favoritos -->
+      <ion-button expand="block" color="warning" routerLink="/favoritos">
+        Ver favoritos
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
 
   <!-- Lista de cócteles -->
   <ion-card *ngFor="let coctel of cocteles">
+    <!-- Imagen del cóctel -->
     <img [src]="coctel.imagen" alt="Imagen del cóctel" />
     <ion-card-header>
       <ion-card-title>{{ coctel.nombre }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
+      <!-- Botón para ver el detalle del cóctel -->
       <ion-button expand="block" color="primary" (click)="verDetalle(coctel)">
         Ver Detalle
       </ion-button>
+      <!-- Botón para añadir o quitar favoritos -->
       <ion-button
         expand="block"
         [color]="esFavorito(coctel) ? 'warning' : 'success'"
@@ -40,5 +50,6 @@
       </ion-button>
     </ion-card-content>
   </ion-card>
+<button mat-raised-button color="primary">Soy un botón Material</button>
 
 </ion-content>

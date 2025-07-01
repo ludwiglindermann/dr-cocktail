@@ -1,56 +1,57 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { StorageService } from '../services/storage.service';  // importamos nuestro servicio
+import { StorageService } from '../services/storage.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.page.html',
   styleUrls: ['./registro.page.scss'],
-  standalone: false, // trabajamos con NgModules
+  standalone: false,
 })
-export class RegistroPage {
-  // variables para capturar datos del formulario
-  nuevoUsuario: string = '';
-  nuevaContrasena: string = '';
-  nuevoCorreo: string = '';
+export class RegistroPage implements OnInit {
+
+  registroForm!: FormGroup;   // el formulario reactivo
 
   constructor(
     private router: Router,
     private alertController: AlertController,
-    private storageService: StorageService  // inyectamos el servicio
+    private storageService: StorageService,
+    private formBuilder: FormBuilder
   ) {}
 
-  // método registrar que se ejecuta al presionar el botón de registro
+  ngOnInit() {
+    // definición de validaciones
+    this.registroForm = this.formBuilder.group({
+      usuario: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^\S+$/)]],
+      contrasena: ['', [Validators.required, Validators.minLength(6)]],
+      correo: ['', [Validators.required, Validators.email]]
+    });
+  }
+
   async registrar() {
-    if (!this.nuevoUsuario || !this.nuevaContrasena || !this.nuevoCorreo) {
-      await this.mostrarAlerta('Debes ingresar usuario, contraseña y correo.');
+    if (!this.registroForm.valid) {
+      await this.mostrarAlerta('Por favor completa todos los campos correctamente.');
       return;
     }
 
-    // recuperamos usuarios previamente almacenados
+    const nuevoUsuario = this.registroForm.value;
+
     let usuarios = await this.storageService.obtenerUsuarios();
 
-    // verificamos si ya existe el usuario
-    const existe = usuarios.find((u: any) => u.usuario === this.nuevoUsuario);
+    const existe = usuarios.find((u: any) => u.usuario === nuevoUsuario.usuario);
     if (existe) {
       await this.mostrarAlerta('El nombre de usuario ya existe.');
       return;
     }
 
-    // agregamos el nuevo usuario
-    await this.storageService.agregarUsuario({
-      usuario: this.nuevoUsuario,
-      contrasena: this.nuevaContrasena,
-      correo: this.nuevoCorreo
-    });
+    await this.storageService.agregarUsuario(nuevoUsuario);
 
-    // confirmamos y redirigimos
     await this.mostrarAlerta('¡Usuario registrado con éxito!');
     this.router.navigate(['/login']);
   }
 
-  // alertas reutilizables
   async mostrarAlerta(mensaje: string) {
     const alerta = await this.alertController.create({
       header: 'Registro',
@@ -59,4 +60,5 @@ export class RegistroPage {
     });
     await alerta.present();
   }
+
 }

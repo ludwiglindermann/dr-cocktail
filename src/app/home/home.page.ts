@@ -19,9 +19,9 @@ export class HomePage {
         '2 cucharaditas de azúcar',
         '6 hojas de menta',
         'Agua con gas',
-        'Hielo',
+        'Hielo'
       ],
-      preparacion: 'Machacar la menta con el azúcar y el limón, añadir hielo, ron y completar con agua con gas.',
+      preparacion: 'Machacar la menta con el azúcar y el limón, añadir hielo, ron y completar con agua con gas.'
     },
     {
       nombre: 'Daiquiri',
@@ -29,9 +29,9 @@ export class HomePage {
       ingredientes: [
         '2 oz de ron blanco',
         '1 oz de jugo de lima',
-        '1/2 oz de jarabe de azúcar',
+        '1/2 oz de jarabe de azúcar'
       ],
-      preparacion: 'Agitar todos los ingredientes con hielo y servir colado en una copa de cóctel.',
+      preparacion: 'Agitar todos los ingredientes con hielo y servir colado en una copa de cóctel.'
     },
     {
       nombre: 'Piña Colada',
@@ -40,13 +40,14 @@ export class HomePage {
         '2 oz de ron',
         '1 oz de crema de coco',
         '3 oz de jugo de piña',
-        'Hielo',
+        'Hielo'
       ],
-      preparacion: 'Mezclar todos los ingredientes en la licuadora hasta que quede suave. Servir frío.',
-    },
+      preparacion: 'Mezclar todos los ingredientes en la licuadora hasta que quede suave. Servir frío.'
+    }
   ];
 
-  favoritos: any[] = []; // lista de favoritos
+  favoritos: any[] = [];
+  usuarioActual: string = '';
 
   constructor(
     private router: Router,
@@ -54,8 +55,12 @@ export class HomePage {
   ) {}
 
   async ngOnInit() {
-    // Carga los favoritos guardados
-    this.favoritos = await this.storageService.obtenerFavoritos();
+    // leer usuario actual
+    const datosUsuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
+    this.usuarioActual = datosUsuario.usuario || '';
+
+    // cargar favoritos del usuario actual
+    this.favoritos = await this.storageService.obtenerFavoritos(this.usuarioActual);
   }
 
   verDetalle(coctel: any) {
@@ -64,26 +69,21 @@ export class HomePage {
     });
   }
 
-  async toggleFavorito(coctel: any) {
-    const existe = this.favoritos.find(f => f.nombre === coctel.nombre);
-    if (existe) {
-      // eliminar si ya está
-      await this.storageService.eliminarFavorito(coctel.nombre);
-    } else {
-      // agregar si no está
-      await this.storageService.agregarFavorito(coctel);
-    }
-
-    // recargar lista actualizada
-    this.favoritos = await this.storageService.obtenerFavoritos();
+  cerrarSesion() {
+    localStorage.removeItem('sesion');
+    this.router.navigate(['/login']);
   }
 
   esFavorito(coctel: any): boolean {
     return this.favoritos.some(f => f.nombre === coctel.nombre);
   }
 
-  cerrarSesion() {
-    localStorage.removeItem('sesion');
-    this.router.navigate(['/login']);
+  async toggleFavorito(coctel: any) {
+    if (this.esFavorito(coctel)) {
+      await this.storageService.eliminarFavorito(this.usuarioActual, coctel.nombre);
+    } else {
+      await this.storageService.agregarFavorito(this.usuarioActual, coctel);
+    }
+    this.favoritos = await this.storageService.obtenerFavoritos(this.usuarioActual);
   }
 }

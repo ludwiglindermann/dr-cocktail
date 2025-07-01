@@ -1,0 +1,30 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mis favoritos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Mis favoritos</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card *ngFor="let coctel of favoritos">
+    <img [src]="coctel.imagen" alt="Imagen del cóctel" />
+    <ion-card-header>
+      <ion-card-title>{{ coctel.nombre }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ul>
+        <li *ngFor="let ingrediente of coctel.ingredientes">{{ ingrediente }}</li>
+      </ul>
+      <p>{{ coctel.preparacion }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" color="medium" (click)="volver()">
+    Volver al inicio
+  </ion-button>
+</ion-content>
