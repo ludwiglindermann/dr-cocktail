@@ -46,7 +46,19 @@
       Formato de correo inválido.
     </ion-text>
 
-    <!-- Botón -->
+    <!-- Botón para tomar foto -->
+    <ion-button expand="block" color="tertiary" (click)="tomarFoto()">
+      Tomar foto de perfil
+    </ion-button>
+
+    <!-- Vista previa de la foto -->
+    <ion-img
+      *ngIf="registroForm.get('foto')?.value"
+      [src]="registroForm.get('foto')?.value"
+      style="margin: 16px auto; width: 160px; height: 160px; border-radius: 50%; object-fit: cover;">
+    </ion-img>
+
+    <!-- Botón de registro -->
     <ion-button expand="block" type="submit" class="ion-margin-top">
       Registrarse
     </ion-button>

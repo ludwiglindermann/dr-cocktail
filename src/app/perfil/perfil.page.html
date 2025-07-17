@@ -1,21 +1,42 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Perfil</ion-title>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mi Perfil</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Información del Usuario</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p><strong>Usuario:</strong> {{ usuario?.usuario }}</p>
-      <p><strong>Correo:</strong> {{ usuario?.correo }}</p>
-    </ion-card-content>
-  </ion-card>
 
-  <ion-button expand="block" color="medium" routerLink="/home">
+  <!-- Imagen de perfil -->
+  <div style="text-align: center;">
+    <ion-img
+      [src]="usuarioActual.foto || 'assets/default-avatar.png'"
+      style="margin: 16px auto; width: 160px; height: 160px; border-radius: 50%; object-fit: cover;">
+    </ion-img>
+  </div>
+
+  <!-- Botón para actualizar la foto -->
+  <ion-button expand="block" color="primary" (click)="actualizarFoto()">
+    {{ usuarioActual.foto ? 'Actualizar foto' : 'Agregar foto de perfil' }}
+  </ion-button>
+
+  <!-- Información del usuario -->
+  <ion-list>
+    <ion-item>
+      <ion-label>Usuario</ion-label>
+      <ion-text>{{ usuarioActual.usuario }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Correo</ion-label>
+      <ion-text>{{ usuarioActual.correo }}</ion-text>
+    </ion-item>
+  </ion-list>
+
+  <!-- Botón extra de regreso -->
+  <ion-button expand="block" color="medium" routerLink="/home" style="margin-top: 24px;">
     Volver al inicio
   </ion-button>
+
 </ion-content>

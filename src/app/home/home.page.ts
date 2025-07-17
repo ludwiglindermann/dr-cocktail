@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
+import { SQLiteService } from '../services/sqlite.service';
+import { ApiCoctelesService } from '../services/api-cocteles.service';
+import { Clipboard } from '@capacitor/clipboard';
+
 
 @Component({
   selector: 'app-home',
@@ -9,58 +13,60 @@ import { StorageService } from '../services/storage.service';
   standalone: false,
 })
 export class HomePage {
-  cocteles = [
-    {
-      nombre: 'Mojito',
-      imagen: 'https://cuberspremium.com/wp-content/uploads/2017/07/receta-mojito.jpg',
-      ingredientes: [
-        '2 oz de ron blanco',
-        '1 oz de jugo de limón',
-        '2 cucharaditas de azúcar',
-        '6 hojas de menta',
-        'Agua con gas',
-        'Hielo'
-      ],
-      preparacion: 'Machacar la menta con el azúcar y el limón, añadir hielo, ron y completar con agua con gas.'
-    },
-    {
-      nombre: 'Daiquiri',
-      imagen: 'https://assets.bacardicontenthub.com/transform/8178432e-721f-4c42-b075-7392a94434b6/Bacardi_Daiquiri_Headerbanner_Mobile_PBX?io=transform:fit,width:500,height:625&format=jpg&quality=75',
-      ingredientes: [
-        '2 oz de ron blanco',
-        '1 oz de jugo de lima',
-        '1/2 oz de jarabe de azúcar'
-      ],
-      preparacion: 'Agitar todos los ingredientes con hielo y servir colado en una copa de cóctel.'
-    },
-    {
-      nombre: 'Piña Colada',
-      imagen: 'https://assets.bacardicontenthub.com/transform/6873626b-8752-4f06-9111-45b918892348/FY22_FR_Bacardi_PinaColada_Cocktail_HeroMobile_2400x3000?io=transform:fit,width:500,height:625&format=jpg&quality=75',
-      ingredientes: [
-        '2 oz de ron',
-        '1 oz de crema de coco',
-        '3 oz de jugo de piña',
-        'Hielo'
-      ],
-      preparacion: 'Mezclar todos los ingredientes en la licuadora hasta que quede suave. Servir frío.'
-    }
-  ];
-
+  cocteles: any[] = [];
   favoritos: any[] = [];
   usuarioActual: string = '';
 
   constructor(
     private router: Router,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private sqliteService: SQLiteService,
+    private apiCoctelesService: ApiCoctelesService
   ) {}
 
+async copiarIngredientes(coctel: any) {
+  const texto = `Ingredientes para ${coctel.nombre}:\n` + coctel.ingredientes.join('\n');
+  await Clipboard.write({
+    string: texto
+  });
+  alert('Ingredientes copiados al portapapeles');
+}
+
+
   async ngOnInit() {
-    // leer usuario actual
     const datosUsuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
     this.usuarioActual = datosUsuario.usuario || '';
+    this.favoritos = await this.sqliteService.obtenerFavoritos();
 
-    // cargar favoritos del usuario actual
-    this.favoritos = await this.storageService.obtenerFavoritos(this.usuarioActual);
+    // Buscar cocteles
+    this.buscarCoctelesPorNombres(['mojito', 'daiquiri', 'margarita', 'negroni', 'martini']);
+  }
+
+  buscarCoctelesPorNombres(nombres: string[]) {
+    nombres.forEach(nombre => {
+      this.apiCoctelesService.buscarCocteles(nombre).subscribe(res => {
+        const procesados = res.map((drink: any) => ({
+          id: drink.idDrink,
+          nombre: drink.strDrink,
+          imagen: drink.strDrinkThumb,
+          ingredientes: this.extraerIngredientes(drink),
+          preparacion: drink.strInstructionsES || drink.strInstructions
+        }));
+        this.cocteles = [...this.cocteles, ...procesados];
+      });
+    });
+  }
+
+  extraerIngredientes(drink: any): string[] {
+    const ingredientes: string[] = [];
+    for (let i = 1; i <= 15; i++) {
+      const ing = drink[`strIngredient${i}`];
+      const med = drink[`strMeasure${i}`];
+      if (ing) {
+        ingredientes.push(`${med || ''} ${ing}`.trim());
+      }
+    }
+    return ingredientes;
   }
 
   verDetalle(coctel: any) {
@@ -75,15 +81,17 @@ export class HomePage {
   }
 
   esFavorito(coctel: any): boolean {
-    return this.favoritos.some(f => f.nombre === coctel.nombre);
+    return this.favoritos.some(f => f.id === coctel.id);
   }
 
   async toggleFavorito(coctel: any) {
-    if (this.esFavorito(coctel)) {
-      await this.storageService.eliminarFavorito(this.usuarioActual, coctel.nombre);
+    const index = this.favoritos.findIndex(f => f.id === coctel.id);
+    if (index > -1) {
+      await this.sqliteService.eliminarFavorito(coctel.id);
+      this.favoritos.splice(index, 1);
     } else {
-      await this.storageService.agregarFavorito(this.usuarioActual, coctel);
+      await this.sqliteService.agregarFavorito(coctel);
+      this.favoritos.push(coctel);
     }
-    this.favoritos = await this.storageService.obtenerFavoritos(this.usuarioActual);
   }
 }

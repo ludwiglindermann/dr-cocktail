@@ -58,6 +58,17 @@ export class StorageService {
     }
   }
 
+async actualizarUsuario(usuarioActualizado: any) {
+  let usuarios = await this.obtenerUsuarios();
+  const index = usuarios.findIndex((u: any) => u.usuario === usuarioActualizado.usuario);
+  if (index > -1) {
+    usuarios[index] = usuarioActualizado;
+    await this._storage?.set('usuarios', usuarios);
+  }
+}
+
+
+
   async eliminarFavorito(usuario: string, nombre: string) {
     let favs = await this.obtenerFavoritos(usuario);
     favs = favs.filter(f => f.nombre !== nombre);

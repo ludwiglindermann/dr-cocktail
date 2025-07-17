@@ -6,28 +6,28 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-<ion-grid>
-  <ion-row>
-    <ion-col>
-      <!-- Botón para ir al perfil -->
-      <ion-button expand="block" color="medium" routerLink="/perfil">
-        Ver mi perfil
-      </ion-button>
-    </ion-col>
-    <ion-col>
-      <!-- Botón para cerrar sesión -->
-      <ion-button expand="block" color="danger" (click)="cerrarSesion()">
-        Cerrar sesión
-      </ion-button>
-    </ion-col>
-    <ion-col>
-      <!-- Botón para ver favoritos -->
-      <ion-button expand="block" color="warning" routerLink="/favoritos">
-        Ver favoritos
-      </ion-button>
-    </ion-col>
-  </ion-row>
-</ion-grid>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <!-- Botón para ir al perfil -->
+        <ion-button expand="block" color="medium" routerLink="/perfil">
+          Ver mi perfil
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <!-- Botón para cerrar sesión -->
+        <ion-button expand="block" color="danger" (click)="cerrarSesion()">
+          Cerrar sesión
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <!-- Botón para ver favoritos -->
+        <ion-button expand="block" color="warning" routerLink="/favoritos">
+          Ver favoritos
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <!-- Lista de cócteles -->
   <ion-card *ngFor="let coctel of cocteles">
@@ -41,6 +41,7 @@
       <ion-button expand="block" color="primary" (click)="verDetalle(coctel)">
         Ver Detalle
       </ion-button>
+
       <!-- Botón para añadir o quitar favoritos -->
       <ion-button
         expand="block"
@@ -48,8 +49,15 @@
         (click)="toggleFavorito(coctel)">
         {{ esFavorito(coctel) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}
       </ion-button>
+
+      <!-- Botón para copiar ingredientes -->
+      <ion-button expand="block" color="secondary" (click)="copiarIngredientes(coctel)">
+        Copiar ingredientes
+      </ion-button>
     </ion-card-content>
   </ion-card>
-<button mat-raised-button color="primary">Soy un botón Material</button>
+
+  <!-- Botón de prueba con Angular Material (opcional) -->
+  <button mat-raised-button color="primary">Soy un botón Material</button>
 
 </ion-content>
