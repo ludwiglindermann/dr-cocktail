@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { StorageService } from '../services/storage.service';
 import { Router } from '@angular/router';
+import { SQLiteService } from '../services/sqlite.service';
 
 @Component({
   selector: 'app-favoritos',
@@ -10,24 +10,16 @@ import { Router } from '@angular/router';
 })
 export class FavoritosPage implements OnInit {
   favoritos: any[] = [];
-  usuarioActual: string = '';
 
   constructor(
-    private storageService: StorageService,
+    private sqliteService: SQLiteService,
     private router: Router
   ) {}
 
   async ngOnInit() {
-    const usuarioData = localStorage.getItem('usuarioActual');
-    if (usuarioData) {
-      const datos = JSON.parse(usuarioData);
-      this.usuarioActual = datos.usuario;
-    }
-
-    this.favoritos = await this.storageService.obtenerFavoritos(this.usuarioActual);
+    this.favoritos = await this.sqliteService.obtenerFavoritos();
   }
 
-  // función para volver al home
   volver() {
     this.router.navigate(['/home']);
   }

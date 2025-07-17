@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
+import { SQLiteService } from './services/sqlite.service';
 
 @Component({
   selector: 'app-root',
@@ -8,13 +9,15 @@ import { Storage } from '@ionic/storage-angular';
   standalone: false,
 })
 export class AppComponent {
-  constructor(private storage: Storage) {
-    this.initStorage();
+  constructor(
+    private storage: Storage,
+    private sqliteService: SQLiteService
+  ) {
+    this.initApp();
   }
 
-  // inicializa la base de datos cuando parte la app
-  async initStorage() {
+  async initApp() {
     await this.storage.create();
-    console.log('Storage inicializado correctamente');
+    await this.sqliteService.initDB();
   }
 }

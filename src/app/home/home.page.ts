@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChildren, ElementRef, QueryList, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 import { SQLiteService } from '../services/sqlite.service';
 import { ApiCoctelesService } from '../services/api-cocteles.service';
 import { Clipboard } from '@capacitor/clipboard';
-
+import { AnimationController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +12,9 @@ import { Clipboard } from '@capacitor/clipboard';
   styleUrls: ['./home.page.scss'],
   standalone: false,
 })
-export class HomePage {
+export class HomePage implements AfterViewInit {
+  @ViewChildren('cardRef', { read: ElementRef }) tarjetas!: QueryList<ElementRef>;
+
   cocteles: any[] = [];
   favoritos: any[] = [];
   usuarioActual: string = '';
@@ -21,39 +23,58 @@ export class HomePage {
     private router: Router,
     private storageService: StorageService,
     private sqliteService: SQLiteService,
-    private apiCoctelesService: ApiCoctelesService
+    private apiCoctelesService: ApiCoctelesService,
+    private animationCtrl: AnimationController
   ) {}
 
-async copiarIngredientes(coctel: any) {
-  const texto = `Ingredientes para ${coctel.nombre}:\n` + coctel.ingredientes.join('\n');
-  await Clipboard.write({
-    string: texto
+  ngAfterViewInit() {
+    // Nada aquí, porque las tarjetas no existen aún
+  }
+
+async ngOnInit() {
+  const datosUsuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
+  this.usuarioActual = datosUsuario.usuario || '';
+  this.favoritos = await this.sqliteService.obtenerFavoritos();
+
+  await this.buscarCoctelesPorNombres(['mojito', 'daiquiri', 'martini']);
+  setTimeout(() => this.animarTarjetas(), 500);
+}
+
+async buscarCoctelesPorNombres(nombres: string[]) {
+  const peticiones = nombres.map(nombre =>
+    this.apiCoctelesService.buscarCocteles(nombre).toPromise()
+  );
+
+  const respuestas = await Promise.all(peticiones);
+
+  respuestas.forEach(res => {
+    if (res && Array.isArray(res)) {
+      const nuevos = res.map((drink: any) => ({
+        id: drink.idDrink,
+        nombre: drink.strDrink,
+        imagen: drink.strDrinkThumb,
+        ingredientes: this.extraerIngredientes(drink),
+        preparacion: drink.strInstructionsES || drink.strInstructions
+      }));
+      this.cocteles = [...this.cocteles, ...nuevos];
+    }
   });
-  alert('Ingredientes copiados al portapapeles');
 }
 
 
-  async ngOnInit() {
-    const datosUsuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
-    this.usuarioActual = datosUsuario.usuario || '';
-    this.favoritos = await this.sqliteService.obtenerFavoritos();
+  animarTarjetas() {
+    if (!this.tarjetas || this.tarjetas.length === 0) return;
 
-    // Buscar cocteles
-    this.buscarCoctelesPorNombres(['mojito', 'daiquiri', 'margarita', 'negroni', 'martini']);
-  }
-
-  buscarCoctelesPorNombres(nombres: string[]) {
-    nombres.forEach(nombre => {
-      this.apiCoctelesService.buscarCocteles(nombre).subscribe(res => {
-        const procesados = res.map((drink: any) => ({
-          id: drink.idDrink,
-          nombre: drink.strDrink,
-          imagen: drink.strDrinkThumb,
-          ingredientes: this.extraerIngredientes(drink),
-          preparacion: drink.strInstructionsES || drink.strInstructions
-        }));
-        this.cocteles = [...this.cocteles, ...procesados];
-      });
+    this.tarjetas.forEach((tarjeta, index) => {
+      this.animationCtrl
+        .create()
+        .addElement(tarjeta.nativeElement)
+        .duration(1000)
+        .delay(index * 200)
+        .fromTo('opacity', '0', '1')
+        .fromTo('transform', 'translateY(40px)', 'translateY(0)')
+        .easing('ease-out')
+        .play();
     });
   }
 
@@ -70,9 +91,7 @@ async copiarIngredientes(coctel: any) {
   }
 
   verDetalle(coctel: any) {
-    this.router.navigate(['/detalle-coctel'], {
-      state: { coctel }
-    });
+    this.router.navigate(['/detalle-coctel'], { state: { coctel } });
   }
 
   cerrarSesion() {
@@ -84,14 +103,21 @@ async copiarIngredientes(coctel: any) {
     return this.favoritos.some(f => f.id === coctel.id);
   }
 
-  async toggleFavorito(coctel: any) {
-    const index = this.favoritos.findIndex(f => f.id === coctel.id);
-    if (index > -1) {
-      await this.sqliteService.eliminarFavorito(coctel.id);
-      this.favoritos.splice(index, 1);
-    } else {
-      await this.sqliteService.agregarFavorito(coctel);
-      this.favoritos.push(coctel);
-    }
+async toggleFavorito(coctel: any) {
+  const index = this.favoritos.findIndex(f => f.id === coctel.id);
+  if (index > -1) {
+    await this.sqliteService.eliminarFavorito(coctel.id);
+    this.favoritos.splice(index, 1);
+  } else {
+    await this.sqliteService.agregarFavorito(coctel);
+    this.favoritos.push(coctel);
+  }
+}
+
+
+  async copiarIngredientes(coctel: any) {
+    const texto = `Ingredientes para ${coctel.nombre}:\n` + coctel.ingredientes.join('\n');
+    await Clipboard.write({ string: texto });
+    alert('Ingredientes copiados al portapapeles');
   }
 }

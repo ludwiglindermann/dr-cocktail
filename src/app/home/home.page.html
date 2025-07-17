@@ -1,27 +1,35 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Bienvenido a Dr. Cocktail</ion-title>
+    <ion-title class="ion-text-center">Dr. Cocktail</ion-title>
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content [fullscreen]="true" class="ion-padding">
+  <!-- Mensaje de bienvenida con animación simple -->
+<div class="bienvenida">
+  <div class="copas">
+    <ion-icon name="wine-outline"></ion-icon>
+    <ion-icon name="wine-outline"></ion-icon>
+    <ion-icon name="wine-outline"></ion-icon>
+  </div>
+  <h1>¡Bienvenido a Dr. Cocktail!</h1>
+  <p>Explora y guarda tus cócteles favoritos</p>
+</div>
 
   <ion-grid>
     <ion-row>
       <ion-col>
-        <!-- Botón para ir al perfil -->
         <ion-button expand="block" color="medium" routerLink="/perfil">
           Ver mi perfil
         </ion-button>
       </ion-col>
       <ion-col>
-        <!-- Botón para cerrar sesión -->
         <ion-button expand="block" color="danger" (click)="cerrarSesion()">
           Cerrar sesión
         </ion-button>
       </ion-col>
       <ion-col>
-        <!-- Botón para ver favoritos -->
         <ion-button expand="block" color="warning" routerLink="/favoritos">
           Ver favoritos
         </ion-button>
@@ -29,20 +37,17 @@
     </ion-row>
   </ion-grid>
 
-  <!-- Lista de cócteles -->
-  <ion-card *ngFor="let coctel of cocteles">
-    <!-- Imagen del cóctel -->
+  <!-- Tarjetas animadas -->
+  <ion-card *ngFor="let coctel of cocteles" #cardRef>
     <img [src]="coctel.imagen" alt="Imagen del cóctel" />
     <ion-card-header>
       <ion-card-title>{{ coctel.nombre }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <!-- Botón para ver el detalle del cóctel -->
       <ion-button expand="block" color="primary" (click)="verDetalle(coctel)">
         Ver Detalle
       </ion-button>
 
-      <!-- Botón para añadir o quitar favoritos -->
       <ion-button
         expand="block"
         [color]="esFavorito(coctel) ? 'warning' : 'success'"
@@ -50,14 +55,9 @@
         {{ esFavorito(coctel) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}
       </ion-button>
 
-      <!-- Botón para copiar ingredientes -->
       <ion-button expand="block" color="secondary" (click)="copiarIngredientes(coctel)">
         Copiar ingredientes
       </ion-button>
     </ion-card-content>
   </ion-card>
-
-  <!-- Botón de prueba con Angular Material (opcional) -->
-  <button mat-raised-button color="primary">Soy un botón Material</button>
-
 </ion-content>

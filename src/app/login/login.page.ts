@@ -25,7 +25,7 @@ export class LoginPage {
       return;
     }
 
-    // Caso especial admin (lo mantiene igual)
+    // Caso especial admin
     if (this.usuario === 'admin' && this.contrasena === '1234') {
       const usuarioAdmin = {
         usuario: 'admin',
@@ -36,16 +36,13 @@ export class LoginPage {
       return;
     }
 
-    // Lee usuarios guardados desde Storage
     const usuariosGuardados = (await this.storage.get('usuarios')) || [];
 
-    // Buscar coincidencia
     const usuarioValido = usuariosGuardados.find(
       (u: any) => u.usuario === this.usuario && u.contrasena === this.contrasena
     );
 
     if (usuarioValido) {
-      // Guarda sesión en storage
       await this.storage.set('usuarioActual', usuarioValido);
       this.router.navigate(['/home']);
     } else {
@@ -66,9 +63,15 @@ export class LoginPage {
     this.router.navigate(['/registro']);
   }
 
-    mostrarAcercaDe() {
-    alert(
-      "Alumno: Ludwig Lindermann\nProfesor: Miguel Puebla\nCurso: Programación de Aplicaciones Móviles"
-    );
-  }
+  async mostrarAcercaDe() {
+  const alerta = await this.alertController.create({
+    header: 'Acerca de Dr. Cocktail',
+    message:
+      'Profesor: Miguel Puebla\n' +
+      'Alumno: Ludwig Lindermann\n' +
+      'Curso: Programación de Aplicaciones Móviles',
+    buttons: ['Cerrar']
+  });
+  await alerta.present();
+}
 }

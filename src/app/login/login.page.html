@@ -1,10 +1,10 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Iniciar sesión</ion-title>
+    <ion-title class="ion-text-center">Dr. Cocktail</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" fullscreen="true">
   <ion-card>
     <ion-card-header>
       <ion-card-title>Bienvenido</ion-card-title>
@@ -23,17 +23,16 @@
       </ion-item>
 
       <ion-button expand="block" class="ion-margin-top" (click)="ingresar()">
-        Ingresar
+        INGRESAR
       </ion-button>
 
       <ion-button expand="block" fill="clear" (click)="irARegistro()">
-        ¿No tienes cuenta? Regístrate
+        ¿NO TIENES CUENTA? REGÍSTRATE
       </ion-button>
 
-      <button mat-raised-button color="primary" (click)="mostrarAcercaDe()">
-        Acerca de
-      </button>
-
+      <ion-button expand="block" fill="outline" (click)="mostrarAcercaDe()">
+        ACERCA DE
+      </ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>
