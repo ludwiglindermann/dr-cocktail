@@ -28,39 +28,40 @@ export class HomePage implements AfterViewInit {
   ) {}
 
   ngAfterViewInit() {
-    // Nada aquí, porque las tarjetas no existen aún
+    // Animación ocurre tras renderizado
   }
 
-async ngOnInit() {
-  const datosUsuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
-  this.usuarioActual = datosUsuario.usuario || '';
-  this.favoritos = await this.sqliteService.obtenerFavoritos();
+  async ngOnInit() {
+    await this.sqliteService.initDB(); // <-- Asegura conexión antes de usar
 
-  await this.buscarCoctelesPorNombres(['mojito', 'daiquiri', 'martini']);
-  setTimeout(() => this.animarTarjetas(), 500);
-}
+    const datosUsuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
+    this.usuarioActual = datosUsuario.usuario || '';
+    this.favoritos = await this.sqliteService.obtenerFavoritos();
 
-async buscarCoctelesPorNombres(nombres: string[]) {
-  const peticiones = nombres.map(nombre =>
-    this.apiCoctelesService.buscarCocteles(nombre).toPromise()
-  );
+    await this.buscarCoctelesPorNombres(['mojito', 'daiquiri', 'martini']);
+    setTimeout(() => this.animarTarjetas(), 500);
+  }
 
-  const respuestas = await Promise.all(peticiones);
+  async buscarCoctelesPorNombres(nombres: string[]) {
+    const peticiones = nombres.map(nombre =>
+      this.apiCoctelesService.buscarCocteles(nombre).toPromise()
+    );
 
-  respuestas.forEach(res => {
-    if (res && Array.isArray(res)) {
-      const nuevos = res.map((drink: any) => ({
-        id: drink.idDrink,
-        nombre: drink.strDrink,
-        imagen: drink.strDrinkThumb,
-        ingredientes: this.extraerIngredientes(drink),
-        preparacion: drink.strInstructionsES || drink.strInstructions
-      }));
-      this.cocteles = [...this.cocteles, ...nuevos];
-    }
-  });
-}
+    const respuestas = await Promise.all(peticiones);
 
+    respuestas.forEach(res => {
+      if (res && Array.isArray(res)) {
+        const nuevos = res.map((drink: any) => ({
+          id: drink.idDrink,
+          nombre: drink.strDrink,
+          imagen: drink.strDrinkThumb,
+          ingredientes: this.extraerIngredientes(drink),
+          preparacion: drink.strInstructionsES || drink.strInstructions
+        }));
+        this.cocteles = [...this.cocteles, ...nuevos];
+      }
+    });
+  }
 
   animarTarjetas() {
     if (!this.tarjetas || this.tarjetas.length === 0) return;
@@ -103,17 +104,16 @@ async buscarCoctelesPorNombres(nombres: string[]) {
     return this.favoritos.some(f => f.id === coctel.id);
   }
 
-async toggleFavorito(coctel: any) {
-  const index = this.favoritos.findIndex(f => f.id === coctel.id);
-  if (index > -1) {
-    await this.sqliteService.eliminarFavorito(coctel.id);
-    this.favoritos.splice(index, 1);
-  } else {
-    await this.sqliteService.agregarFavorito(coctel);
-    this.favoritos.push(coctel);
+  async toggleFavorito(coctel: any) {
+    const index = this.favoritos.findIndex(f => f.id === coctel.id);
+    if (index > -1) {
+      await this.sqliteService.eliminarFavorito(coctel.id);
+      this.favoritos.splice(index, 1);
+    } else {
+      await this.sqliteService.agregarFavorito(coctel);
+      this.favoritos.push(coctel);
+    }
   }
-}
-
 
   async copiarIngredientes(coctel: any) {
     const texto = `Ingredientes para ${coctel.nombre}:\n` + coctel.ingredientes.join('\n');

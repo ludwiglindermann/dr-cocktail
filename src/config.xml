@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.dr.cocktail.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>dr-cocktail</name>
+  <description>Aplicación móvil para explorar y guardar cócteles favoritos.</description>
+  <author email="ludwig.lindermann.c@gmail.com" href="https://github.com/ludwiglindermann">Ludwig Lindermann</author>
+  <content src="index.html" />
+  <access origin="*" />
+  <allow-intent href="http://*/*" />
+  <allow-intent href="https://*/*" />
+  <allow-navigation href="*" />
+  <platform name="android">
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="android-targetSdkVersion" value="33" />
+    <icon src="resources/android/icon/drawable-xxxhdpi-icon.png" />
+  </platform>
+</widget>

@@ -17,6 +17,7 @@ export class FavoritosPage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    await this.sqliteService.initDB(); // <-- Asegura conexión antes de leer
     this.favoritos = await this.sqliteService.obtenerFavoritos();
   }
 
